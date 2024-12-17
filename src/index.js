@@ -20,4 +20,6 @@ app.use((error, req, res, next) => {
   return res.status(500).json({ message: "An unknown error occurred" });
 });
 
-app.listen(3000);
+app.listen(3000, () => console.log("Server ready on port 3000."));
+
+export default app;
