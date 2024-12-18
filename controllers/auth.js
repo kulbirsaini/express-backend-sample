@@ -41,7 +41,7 @@ export const register = async (req, res, next) => {
 };
 
 export const login = async (req, res, next) => {
-  console.log("POST /login", req.body);
+  console.log("POST /login");
   const result = validationResult(req);
   if (!result.isEmpty()) {
     return res.status(401).json({ message: "Invalid email or password" });
@@ -76,7 +76,7 @@ export const login = async (req, res, next) => {
 };
 
 export const logout = async (req, res, next) => {
-  console.log("DELETE /logout", req.body);
+  console.log("DELETE /logout");
 
   if (!req.currentUser || !req.authToken) {
     return res.status(200).json({ message: "Logged out successfully." });
@@ -95,7 +95,7 @@ export const logout = async (req, res, next) => {
 };
 
 export const me = async (req, res, next) => {
-  console.log("GET /me", req.body);
+  console.log("GET /me");
 
   if (req?.currentUser) {
     return res.json({ user: req.currentUser });
