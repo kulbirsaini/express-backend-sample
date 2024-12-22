@@ -1,5 +1,5 @@
 import { validationResult } from "express-validator";
-import { getPostById } from "../lib/appwrite.js";
+import { Post } from "../models/post.js";
 
 export const verifyPostExists = async (req, res, next) => {
   const result = validationResult(req);
@@ -13,7 +13,7 @@ export const verifyPostExists = async (req, res, next) => {
       return res.status(404).json({ message: "Invalid post id" });
     }
 
-    const post = await getPostById(id);
+    const post = await Post.findById(id);
     if (!post) {
       return res.status(404).json({ message: "Post not found" });
     }

@@ -14,7 +14,6 @@ router.post(
     { name: "video", maxCount: 1 },
   ]),
   body("title").notEmpty().isLength({ min: 3, max: 64 }),
-  body("prompt").notEmpty().isLength({ min: 3, max: 255 }),
   createPost
 );
 router.put("/:id/like", param("id").notEmpty(), verifyPostExists, likePost);
