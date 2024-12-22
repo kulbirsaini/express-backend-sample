@@ -2,7 +2,7 @@
 
 I created this app as a backend for the [React Native App](https://github.com/kulbirsaini/react-native-android-ios-app) that I worked on to learn React Native app building. It has pretty much everything required to support a basic Android/iOS app.
 
-### Featuers
+### Featuers / Endpoints
 
 - User
   - Registration (`POST /auth/register`)
