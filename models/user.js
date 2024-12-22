@@ -1,5 +1,5 @@
 import { model, Schema } from "mongoose";
-import { getTimeToLive, getToken, getUserIdFromToken } from "../lib/jwt.js";
+import { generateOtp, getTimeToLive, getToken, getUserIdFromToken } from "../lib/jwt.js";
 
 const userSchema = new Schema(
   {
@@ -33,6 +33,10 @@ const userSchema = new Schema(
       default: false,
     },
     confirmationToken: {
+      type: String,
+      required: false,
+    },
+    otp: {
       type: String,
       required: false,
     },
@@ -105,6 +109,7 @@ class UserClass {
       throw new Error("Failed to generate confirmation token");
     }
 
+    this.otp = generateOtp(6);
     this.confirmationToken = confirmationToken;
     //TODO Trigger confirmation email
     return await this.save();
@@ -126,6 +131,7 @@ class UserClass {
   async confirm() {
     if (!this.confirmed || this.confirmationToken) {
       this.confirmed = true;
+      this.otp = "";
       this.confirmationToken = "";
       await this.save();
     }
@@ -155,6 +161,25 @@ class UserClass {
 
   static async confirmUserWithConfirmationToken(token) {
     const user = await User.findUserByConfirmationToken(token);
+    await user.confirm();
+    return user;
+  }
+
+  static async confirmUserWithOtp(email, otp) {
+    const user = await User.findOne({ email });
+    if (!user) {
+      throw new Error("User not found.");
+    }
+
+    // If the user is already confirmed, we don't need to do anything
+    if (user && user.confirmed) {
+      return user;
+    }
+
+    if (user.otp !== otp.trim()) {
+      throw new Error("Invalid OTP");
+    }
+
     await user.confirm();
     return user;
   }

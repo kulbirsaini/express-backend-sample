@@ -6,10 +6,12 @@ I created this app as a backend for the [React Native App](https://github.com/ku
 
 - User
   - Registration (`POST /auth/register`)
-  - Confirmation (`GET /auth/confirm`)
+  - Confirmation via token (`GET /auth/confirm/:token`)
+  - Confirmation via OTP (`POST /auth/confirm/otp`)
+    - Required Email and OTP for confirmation
   - Request Confirmation (`POST /auth/confirm`)
   - Login (`POST /auth/login`)
-    - Return JWT
+    - Returns JWT on successful authentication
   - Logout (`DELETE /auth/logout`)
   - Profile (`GET /auth/me`)
     - Using `Authorization` header

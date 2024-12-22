@@ -79,6 +79,23 @@ export const confirm = async (req, res, next) => {
   }
 };
 
+export const confirmViaOTP = async (req, res, next) => {
+  console.log("POST /confirm/otp");
+  const result = validationResult(req);
+  if (!result.isEmpty()) {
+    return res.status(401).json({ message: "Invalid OTP." });
+  }
+
+  const { email, otp } = req.body;
+  try {
+    await User.confirmUserWithOtp(email, otp);
+    return res.json({ message: "Email confirmed successfully." });
+  } catch (error) {
+    console.error("confirm", email, error);
+    return res.status(401).json({ message: "Invalid OTP. Please request another confirmation email." });
+  }
+};
+
 export const login = async (req, res, next) => {
   console.log("POST /login");
   const result = validationResult(req);

@@ -31,7 +31,7 @@ app.use(
 app.use(bodyParser.json());
 
 app.use(router);
-app.use(AuthRouter);
+app.use("/auth", AuthRouter);
 app.use("/posts", verifyAuth, PostRouter);
 app.use((error, req, res, next) => {
   console.error("Global error handler", error);
@@ -39,7 +39,11 @@ app.use((error, req, res, next) => {
 });
 
 database()
-  .then(() => app.listen(process.env.PORT, () => console.log(`Server ready on port ${process.env.PORT}. Visit http://localhost:${process.env.PORT}/hello`)))
+  .then(() =>
+    app.listen(process.env.PORT, () =>
+      console.log(`Server ready on port ${process.env.PORT}. Visit http://localhost:${process.env.PORT}/hello`)
+    )
+  )
   .catch((error) => console.log(error));
 
 export default app;
