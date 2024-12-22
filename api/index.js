@@ -39,11 +39,10 @@ app.use((error, req, res, next) => {
 });
 
 database()
-  .then(() =>
-    app.listen(process.env.PORT, () =>
-      console.log(`Server ready on port ${process.env.PORT}. Visit http://localhost:${process.env.PORT}/hello`)
-    )
-  )
+  .then(() => {
+    const port = process.env.PORT || 3000;
+    app.listen(port, () => console.log(`Server ready on port ${port}. Visit http://localhost:${port}/hello`));
+  })
   .catch((error) => console.log(error));
 
 export default app;
