@@ -6,8 +6,6 @@ const MIN_POST_LIMIT = 1;
 const MAX_POST_LIMIT = 10;
 
 export const getAllPosts = async (req, res) => {
-  console.log("GET /posts", req.query);
-
   try {
     const posts = Post.find();
     let { latest = false, limit = 10, search = null, scope = null, userId = null } = req.query;
@@ -51,8 +49,6 @@ export const getAllPosts = async (req, res) => {
 };
 
 export const createPost = async (req, res, next) => {
-  console.log("POST /posts");
-
   const result = validationResult(req);
   if (!result.isEmpty()) {
     return res.status(422).json({ message: "Invalid input" });
@@ -77,8 +73,6 @@ export const createPost = async (req, res, next) => {
 };
 
 export const likePost = async (req, res, next) => {
-  console.log("PUT /posts/:id/like", req.params);
-
   const result = validationResult(req);
   if (!result.isEmpty()) {
     return res.status(422).json({ message: "Invalid post id" });
@@ -99,8 +93,6 @@ export const likePost = async (req, res, next) => {
 };
 
 export const unlikePost = async (req, res, next) => {
-  console.log("PUT /posts/:id/unlike", req.params);
-
   const result = validationResult(req);
   if (!result.isEmpty()) {
     return res.status(422).json({ message: "Invalid post id" });

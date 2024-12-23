@@ -7,6 +7,9 @@ import { verifyAuth } from "../middleware/verifyAuth.js";
 import session from "express-session";
 import MongoStore from "connect-mongo";
 import { database } from "../lib/database.js";
+import swaggerUi from "swagger-ui-express";
+import { swaggerSpecs } from "../lib/swagger.js";
+import morgan from "morgan";
 
 const router = Router();
 router.use("/hello", (req, res) => {
@@ -30,6 +33,9 @@ app.use(
 // Body parser for post requests
 app.use(bodyParser.json());
 
+// Request logging
+app.use(morgan(":method :url :status :res[content-length] - :response-time ms"));
+
 app.use(router);
 app.use("/auth", AuthRouter);
 app.use("/posts", verifyAuth, PostRouter);
@@ -38,11 +44,16 @@ app.use((error, req, res, next) => {
   return res.status(500).json({ message: "An unknown error occurred" });
 });
 
+// Mount swagger API docs only in local development mode
+if (!process.env.VERCEL && process.env.NODE_ENV !== "production") {
+  app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpecs));
+}
+
 database()
   .then(() => {
     const port = process.env.PORT || 3000;
     app.listen(port, () => console.log(`Server ready on port ${port}. Visit http://localhost:${port}/hello`));
   })
-  .catch((error) => console.log(error));
+  .catch((error) => console.error(error));
 
 export default app;

@@ -4,6 +4,58 @@ import { createPost, getAllPosts, likePost, unlikePost } from "../controllers/po
 import { verifyPostExists } from "../middleware/post.js";
 import { uploadMiddlewareGenerator } from "../middleware/upload.js";
 
+/**
+ * @swagger
+ * components:
+ *  schemas:
+ *    Post:
+ *      type: object
+ *      required:
+ *        - title
+ *        - videoUrl
+ *        - thumbnailUrl
+ *        - userId
+ *      properties:
+ *        id:
+ *          type: string
+ *        title:
+ *          type: string
+ *        videoUrl:
+ *          type: string
+ *        thumbnailUrl:
+ *          type: string
+ *        userId:
+ *          type: string
+ *
+ * tags:
+ *  name: Posts
+ *  description: Post management API
+ * /posts:
+ *  get:
+ *    summary: List all posts based on filter criteria
+ *    tags: [Posts]
+ *    responses:
+ *      200:
+ *        description: List of all books
+ *        content:
+ *          application/json:
+ *            schema:
+ *              type: array
+ *              items:
+ *                $ref: '#/components/schemas/Post'
+ * /posts/{id}/like:
+ *  put:
+ *    summary: Like a post
+ *    tags: [Posts]
+ *    responses:
+ *      200:
+ *        description: Post like successful
+ *        content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ */
+
 const router = Router();
 
 router.get("/", getAllPosts);
