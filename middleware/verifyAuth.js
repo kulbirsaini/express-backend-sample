@@ -9,7 +9,7 @@ export const verifyAuth = async (req, res, next) => {
 
     const user = await User.validateAuthToken(token);
     req.authToken = token;
-    req.userTokens = user.tokens;
+    req.userTokens = user?.tokens || [];
     req.currentUser = user;
     next();
   } catch (error) {

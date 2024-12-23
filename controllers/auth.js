@@ -83,8 +83,9 @@ export const confirmViaOTP = async (req, res, next) => {
 
   const { email, otp } = req.body;
   try {
-    await User.confirmUserWithOtp(email, otp);
-    return res.json({ message: "Email confirmed successfully." });
+    const user = await User.confirmUserWithOtp(email, otp);
+    const authToken = await user.createAndSaveAuthToken();
+    return res.json({ user, authToken, message: "Email confirmed successfully." });
   } catch (error) {
     console.error("confirmViaOTP", email, error);
     return res.status(401).json({ message: "Invalid OTP. Please request another confirmation email." });
@@ -104,15 +105,18 @@ export const login = async (req, res, next) => {
       throw new Error("Invalid email or password.");
     }
 
-    if (!user.confirmed) {
-      return res
-        .status(401)
-        .json({ message: "Email is not confirmed. Please check your email and confirm before you can login." });
-    }
-
     const result = await bcrypt.compare(password, user.password);
     if (!result) {
       throw new Error("Invalid email or password.");
+    }
+
+    if (!user.confirmed) {
+      // Generate new confirmation token and OTP if user does not have a valid OTP/confirmation token
+      if (!user.hasValidConfirmationToken()) {
+        await user.generateConfirmationToken();
+      }
+
+      return res.status(423).json({ message: "Email is not confirmed." });
     }
 
     const authToken = await user.createAndSaveAuthToken();
@@ -141,8 +145,8 @@ export const me = async (req, res, next) => {
   if (req?.currentUser) {
     if (!req.currentUser.confirmed) {
       return res
-        .status(401)
-        .json({ message: "Email is not confirmed. Please check your email and confirm before you can login." });
+        .status(423)
+        .json({ message: "Email is not confirmed. Please check your email and confirm account before you can login." });
     }
 
     return res.json({ user: req.currentUser });

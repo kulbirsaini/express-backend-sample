@@ -14,7 +14,7 @@ const postSchema = new Schema(
       type: String,
       required: true,
     },
-    userId: {
+    user: {
       type: Schema.Types.ObjectId,
       required: true,
       ref: "User",
@@ -34,7 +34,7 @@ postSchema.set("toJSON", {
   transform: function (doc, ret, options) {
     return {
       id: ret._id,
-      userId: ret.userId,
+      user: ret.user,
       title: ret.title,
       thumbnailUrl: ret.thumbnailUrl,
       videoUrl: ret.videoUrl,

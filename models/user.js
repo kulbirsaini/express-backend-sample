@@ -1,5 +1,5 @@
 import { model, Schema } from "mongoose";
-import { generateOtp, getTimeToLive, getToken, getUserIdFromToken } from "../lib/jwt.js";
+import { decodeToken, generateOtpToken, getTimeToLive, getToken } from "../lib/jwt.js";
 
 const userSchema = new Schema(
   {
@@ -47,6 +47,7 @@ const userSchema = new Schema(
 userSchema.set("toJSON", {
   transform: function (doc, ret, options) {
     return {
+      id: ret._id,
       name: ret.name,
       email: ret.email,
       avatarUrl: ret.avatarUrl,
@@ -93,7 +94,7 @@ class UserClass {
   }
 
   async createAndSaveAuthToken() {
-    const authToken = getToken(this._id);
+    const authToken = getToken({ id: this._id });
     if (!authToken) {
       throw new Error("Failed to generate authentication token.");
     }
@@ -103,12 +104,12 @@ class UserClass {
   }
 
   async generateConfirmationToken() {
-    const confirmationToken = getToken(this._id);
+    const confirmationToken = getToken({ id: this._id });
     if (!confirmationToken) {
       throw new Error("Failed to generate confirmation token");
     }
 
-    this.otp = generateOtp(6);
+    this.otp = generateOtpToken();
     this.confirmationToken = confirmationToken;
     //TODO Trigger confirmation email
     return await this.save();
@@ -116,7 +117,7 @@ class UserClass {
 
   hasValidConfirmationToken() {
     if (this.confirmationToken) {
-      const { id, exp } = getUserIdFromToken(this.confirmationToken);
+      const { id, exp } = decodeToken(this.confirmationToken);
 
       // If the token exists and expiring in another hour or later, no need to generate another token
       if (id === this._id.toString() && getTimeToLive(exp) > 3600) {
@@ -139,7 +140,7 @@ class UserClass {
   }
 
   static async findUserByConfirmationToken(token) {
-    const { id, exp } = getUserIdFromToken(token);
+    const { id, exp } = decodeToken(token);
 
     if (!id || getTimeToLive(exp) < 0) {
       throw new Error(`Invalid or expired token. Please request another confirmation email.`);
@@ -175,7 +176,12 @@ class UserClass {
       return user;
     }
 
-    if (user.otp !== otp.trim()) {
+    if (!user.otp) {
+      throw new Error("Invalid OTP");
+    }
+
+    const { otp: storedOtp, exp } = decodeToken(user.otp);
+    if (getTimeToLive(exp) < 0 || storedOtp !== otp.trim()) {
       throw new Error("Invalid OTP");
     }
 
@@ -184,7 +190,7 @@ class UserClass {
   }
 
   static async validateAuthToken(token) {
-    const { id, exp } = getUserIdFromToken(token);
+    const { id, exp } = decodeToken(token);
     if (!id || getTimeToLive(exp) < 0) {
       throw new Error(`Invalid or expired token.`);
     }

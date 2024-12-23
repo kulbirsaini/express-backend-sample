@@ -4,8 +4,8 @@ export const uploadMiddlewareGenerator = (fields, limits = {}) => {
   const func = (req, res, next) => {
     const upload = multer({
       limits: {
-        fieldSize: 10 * 1024 * 1024,
-        fileSize: 10 * 1024 * 1024,
+        fieldSize: 25 * 1024 * 1024,
+        fileSize: 25 * 1024 * 1024,
         ...limits,
       },
     }).fields(fields);
@@ -13,7 +13,7 @@ export const uploadMiddlewareGenerator = (fields, limits = {}) => {
     upload(req, res, (error) => {
       if (error instanceof MulterError) {
         // A Multer error occurred when uploading!
-        return res.status(422).json({ message: "An error occurred while uploading files" });
+        return res.status(422).json({ message: "Invalid file format or file too large." });
       } else if (error) {
         return next(error);
       }
