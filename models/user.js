@@ -79,7 +79,6 @@ class UserClass {
     post.likedBy = post.likedBy.filter((currentUserId) => currentUserId.toString() !== userIdStr);
     await post.save();
 
-    console.log(this.likedPosts);
     return this;
   }
 

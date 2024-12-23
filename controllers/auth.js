@@ -3,8 +3,6 @@ import { User } from "../models/user.js";
 import bcrypt from "bcryptjs";
 
 export const register = async (req, res, next) => {
-  console.log("POST /register");
-
   const result = validationResult(req);
   if (!result.isEmpty()) {
     return res.status(422).json({ message: "Invalid input" });
@@ -26,13 +24,12 @@ export const register = async (req, res, next) => {
 
     return res.status(201).json({ message: "Registration successful. Please check your email to confirm the account." });
   } catch (error) {
-    console.error(error);
+    console.error("register", error);
     return res.status(422).json({ message: "Failed to register. Please try again." });
   }
 };
 
 export const requestConfirmation = async (req, res, next) => {
-  console.log("POST /confirm");
   const result = validationResult(req);
   if (!result.isEmpty()) {
     return res.status(422).send("Invalid input.");
@@ -63,7 +60,6 @@ export const requestConfirmation = async (req, res, next) => {
 };
 
 export const confirm = async (req, res, next) => {
-  console.log("GET /confirm");
   const result = validationResult(req);
   if (!result.isEmpty()) {
     return res.status(401).send("Invalid confirmation token.");
@@ -80,7 +76,6 @@ export const confirm = async (req, res, next) => {
 };
 
 export const confirmViaOTP = async (req, res, next) => {
-  console.log("POST /confirm/otp");
   const result = validationResult(req);
   if (!result.isEmpty()) {
     return res.status(401).json({ message: "Invalid OTP." });
@@ -91,13 +86,12 @@ export const confirmViaOTP = async (req, res, next) => {
     await User.confirmUserWithOtp(email, otp);
     return res.json({ message: "Email confirmed successfully." });
   } catch (error) {
-    console.error("confirm", email, error);
+    console.error("confirmViaOTP", email, error);
     return res.status(401).json({ message: "Invalid OTP. Please request another confirmation email." });
   }
 };
 
 export const login = async (req, res, next) => {
-  console.log("POST /login");
   const result = validationResult(req);
   if (!result.isEmpty()) {
     return res.status(401).json({ message: "Invalid email or password." });
@@ -124,14 +118,12 @@ export const login = async (req, res, next) => {
     const authToken = await user.createAndSaveAuthToken();
     return res.json({ user, authToken });
   } catch (error) {
-    console.error(error);
+    console.error("login", error);
     return res.status(401).json({ message: "Invalid email or password." });
   }
 };
 
 export const logout = async (req, res, next) => {
-  console.log("DELETE /logout");
-
   if (!req?.currentUser || !req?.authToken) {
     return res.json({ message: "Logged out successfully." });
   }
@@ -146,8 +138,6 @@ export const logout = async (req, res, next) => {
 };
 
 export const me = async (req, res, next) => {
-  console.log("GET /me");
-
   if (req?.currentUser) {
     if (!req.currentUser.confirmed) {
       return res
