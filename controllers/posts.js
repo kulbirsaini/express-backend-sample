@@ -3,13 +3,12 @@ import { Post } from "../models/post.js";
 import { uploadFile } from "../lib/imagekit.js";
 import { isValidObjectId } from "mongoose";
 
-const MIN_POST_LIMIT = 1;
-const MAX_POST_LIMIT = 10;
+const PAGE_LIMIT = 10;
 
 export const getAllPosts = async (req, res) => {
   try {
-    const posts = Post.find();
-    let { latest = false, limit = 10, search = null, scope = null, userId = null } = req.query;
+    const posts = Post.find().limit(PAGE_LIMIT);
+    let { latest = false, page = 0, search = null, scope = null, userId = null } = req.query;
 
     if (scope === "liked") {
       if (!req.currentUser.likedPosts || !req.currentUser.likedPosts.length) {
@@ -26,13 +25,8 @@ export const getAllPosts = async (req, res) => {
       posts.sort("createdAt");
     }
 
-    limit = limit ? Number(limit) : MAX_POST_LIMIT;
-    if (limit > MAX_POST_LIMIT) {
-      limit = MAX_POST_LIMIT;
-    } else if (limit < MIN_POST_LIMIT) {
-      limit = MIN_POST_LIMIT;
-    }
-    posts.limit(limit);
+    page = page ? Number(page) : 0;
+    posts.skip(page * PAGE_LIMIT);
 
     if (latest && latest.trim()) {
       posts.sort({ createdAt: "desc" });
