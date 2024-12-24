@@ -1,5 +1,7 @@
 import { model, Schema } from "mongoose";
 import { decodeToken, generateOtpToken, getTimeToLive, getToken } from "../lib/jwt.js";
+import { toPng } from "jdenticon";
+import { uploadFile } from "../lib/imagekit.js";
 
 const userSchema = new Schema(
   {
@@ -57,6 +59,13 @@ userSchema.set("toJSON", {
 });
 
 class UserClass {
+  async createAvatar() {
+    const avatar = { originalname: `avatar-${this._id}.png`, buffer: toPng(this.name || this.email, 196) };
+    this.avatarUrl = await uploadFile(avatar);
+    await this.save();
+    return this;
+  }
+
   async likePost(post) {
     // Add to liked posts
     this.likedPosts = [...this.likedPosts, post._id];

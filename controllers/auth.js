@@ -22,6 +22,13 @@ export const register = async (req, res, next) => {
 
     await user.generateConfirmationToken();
 
+    // Try to generate avatar
+    try {
+      await user.createAvatar();
+    } catch (error) {
+      console.error("register avatar", error);
+    }
+
     return res.status(201).json({ message: "Registration successful. Please check your email to confirm the account." });
   } catch (error) {
     console.error("register", error);

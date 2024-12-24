@@ -7,26 +7,23 @@ const PAGE_LIMIT = 10;
 
 export const getAllPosts = async (req, res) => {
   try {
-    const posts = Post.find().limit(PAGE_LIMIT);
-    let { latest = false, page = 0, search = null, scope = null, userId = null } = req.query;
+    const posts = Post.find();
+    let { latest = false, page = 0, limit = PAGE_LIMIT, search = null, scope = null, userId = null } = req.query;
 
     if (scope === "liked") {
       if (!req.currentUser.likedPosts || !req.currentUser.likedPosts.length) {
-        return res.status(200).json({ posts: [] });
+        return res.status(200).json({ posts: [], page });
       }
 
       posts.where("_id").in(req.currentUser.likedPosts);
     } else if (scope === "user") {
       if (!userId || !isValidObjectId(userId.trim())) {
-        return res.status(404).json({ posts: [] });
+        return res.status(404).json({ posts: [], page });
       }
 
       posts.where("user").equals(userId.trim());
       posts.sort("createdAt");
     }
-
-    page = page ? Number(page) : 0;
-    posts.skip(page * PAGE_LIMIT);
 
     if (latest && latest.trim()) {
       posts.sort({ createdAt: "desc" });
@@ -36,7 +33,14 @@ export const getAllPosts = async (req, res) => {
       posts.where("title").regex(new RegExp(search, "gi"));
     }
 
-    return res.json({ posts: await posts.populate("user").exec() });
+    limit = +limit ? Number(limit) : PAGE_LIMIT;
+    limit = Math.min(PAGE_LIMIT, Math.max(limit, 1));
+    posts.limit(limit);
+
+    page = +page ? Number(page) : 0;
+    posts.skip(page * limit);
+
+    return res.json({ posts: await posts.populate("user").exec(), page });
   } catch (error) {
     console.error("getAllPosts", error);
     return res.status(500).json({ message: "An error occurred while fetching posts" });

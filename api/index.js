@@ -15,7 +15,10 @@ const rateLimiter = rateLimit({
   limit: 100, // Limit each IP to 100 requests per `window` (here, per 15 minutes).
   standardHeaders: null, // Avoid sending rate limit headers so that abusers won't know the actual allowed limit
   legacyHeaders: false, // Disable the `X-RateLimit-*` headers.
-  statusCode: process.env.RATE_LIMIT_STATUS_CODE || 429, // Custom status code for bad actors
+  statusCode: Number(process.env.RATE_LIMIT_STATUS_CODE) || 429, // Custom status code for bad actors
+  handler: (req, res, next, options) => {
+    res.status(options.statusCode).json({ message: "Server busy. Please slow down." });
+  },
 });
 
 export const app = express();
