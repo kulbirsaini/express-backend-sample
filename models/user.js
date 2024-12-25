@@ -207,7 +207,7 @@ class UserClass {
       return user;
     }
 
-    const storedOtp = this.getOtp();
+    const storedOtp = user.getOtp();
     if (!storedOtp || storedOtp !== otp.trim()) {
       throw new Error("Invalid OTP");
     }
