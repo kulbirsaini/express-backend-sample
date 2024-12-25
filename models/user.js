@@ -60,8 +60,8 @@ userSchema.set("toJSON", {
 });
 
 class UserClass {
-  async createAvatar() {
-    const avatar = { originalname: `avatar-${this._id}.png`, buffer: toPng(this.name || this.email, 196) };
+  async createAvatar(salt = "") {
+    const avatar = { originalname: `avatar-${this._id}.png`, buffer: toPng(`${this.name || this.email} ${salt}`, 196) };
     this.avatarUrl = await uploadFile(avatar);
     await this.save();
     return this;

@@ -2,9 +2,9 @@
 
 I created this app as a backend for the [React Native App](https://github.com/kulbirsaini/react-native-android-ios-app) that I worked on to learn React Native app building. It has pretty much everything required to support a basic Android/iOS app.
 
-### Featuers / Endpoints
+### Resources / Endpoints
 
-- User
+- Authentication
   - Registration (`POST /auth/register`)
   - Confirmation via token (`GET /auth/confirm/:token`)
   - Confirmation via OTP (`POST /auth/confirm/otp`)
@@ -13,8 +13,10 @@ I created this app as a backend for the [React Native App](https://github.com/ku
   - Login (`POST /auth/login`)
     - Returns JWT on successful authentication
   - Logout (`DELETE /auth/logout`)
-  - Profile (`GET /auth/me`)
+- Authenticated User
+  - Profile (`GET /user/me`)
     - Using `Authorization` header
+  - Generate Random Avatar (`POST /user/random-avatar`)
 - Post
   - Fetch (`GET /posts`)
     - Supports various query parameters

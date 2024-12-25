@@ -154,17 +154,3 @@ export const logout = async (req, res, next) => {
     return res.status(500).json({ message: "An error occurred while logging out" });
   }
 };
-
-export const me = async (req, res, next) => {
-  if (req?.currentUser) {
-    if (!req.currentUser.confirmed) {
-      return res
-        .status(423)
-        .json({ message: "Email is not confirmed. Please check your email and confirm account before you can login." });
-    }
-
-    return res.json({ user: req.currentUser });
-  }
-
-  return res.status(401).json({ message: "Unauthorized access." });
-};
