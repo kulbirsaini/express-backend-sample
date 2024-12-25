@@ -2,6 +2,7 @@ import { model, Schema } from "mongoose";
 import { decodeToken, generateOtpToken, getTimeToLive, getToken } from "../lib/jwt.js";
 import { toPng } from "jdenticon";
 import { uploadFile } from "../lib/imagekit.js";
+import { getAccountConfirmationEmail, sendEmail } from "../lib/mailer.js";
 
 const userSchema = new Schema(
   {
@@ -120,8 +121,29 @@ class UserClass {
 
     this.otp = generateOtpToken();
     this.confirmationToken = confirmationToken;
-    //TODO Trigger confirmation email
     return await this.save();
+  }
+
+  getOtp() {
+    if (this.otp) {
+      const { otp, exp } = decodeToken(this.otp);
+      if (getTimeToLive(exp) > 0 && otp) {
+        return otp;
+      }
+    }
+
+    return null;
+  }
+
+  getConfirmationUrl() {
+    if (this.confirmationToken) {
+      return new URL(`/auth/confirm/${this.confirmationToken}`, process.env.APP_BASE_URL).href;
+    }
+  }
+
+  async sendConfirmationEmail() {
+    const confirmationEmailParams = getAccountConfirmationEmail(this.name, this.getConfirmationUrl(), this.getOtp(), 15);
+    await sendEmail({ ...confirmationEmailParams, to: this.email });
   }
 
   hasValidConfirmationToken() {
@@ -185,12 +207,8 @@ class UserClass {
       return user;
     }
 
-    if (!user.otp) {
-      throw new Error("Invalid OTP");
-    }
-
-    const { otp: storedOtp, exp } = decodeToken(user.otp);
-    if (getTimeToLive(exp) < 0 || storedOtp !== otp.trim()) {
+    const storedOtp = this.getOtp();
+    if (!storedOtp || storedOtp !== otp.trim()) {
       throw new Error("Invalid OTP");
     }
 

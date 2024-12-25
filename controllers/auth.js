@@ -20,7 +20,13 @@ export const register = async (req, res, next) => {
     let user = new User({ name, email, password: encryptedPassword });
     user = await user.save();
 
-    await user.generateConfirmationToken();
+    user = await user.generateConfirmationToken();
+
+    try {
+      await user.sendConfirmationEmail();
+    } catch (error) {
+      console.error("register", error);
+    }
 
     // Try to generate avatar
     try {
@@ -54,11 +60,12 @@ export const requestConfirmation = async (req, res, next) => {
     }
 
     if (user.hasValidConfirmationToken()) {
-      //TODO: Trigger confirmation email
+      await user.sendConfirmationEmail();
       return res.json({ message: "Confirmation request registered. Please check your email to confirm the account." });
     }
 
-    await user.generateConfirmationToken();
+    user = await user.generateConfirmationToken();
+    await user.sendConfirmationEmail();
     return res.json({ message: "Confirmation request registered. Please check your email to confirm the account." });
   } catch (error) {
     console.error("requestConfirmation", error);
