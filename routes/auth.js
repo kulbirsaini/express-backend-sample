@@ -9,7 +9,6 @@ router.post(
   body("name").trim().notEmpty(),
   body("email").isEmail(),
   body("password").isLength({ min: 6, max: 40 }),
-  body("passwordConfirmation").custom((value, { req }) => value === req.body.password),
   register
 );
 router.post("/confirm", body("email").isEmail(), requestConfirmation);
