@@ -23,7 +23,7 @@ export const getAllTickets = async (req, res) => {
     page = +page ? Number(page) : 0;
     tickets.skip(page * limit);
 
-    return res.json({ tickets: await tickets.populate("user").exec(), page });
+    return res.json(await tickets.populate("user").exec());
   } catch (error) {
     console.error("getAllTickets", error);
     return res.status(500).json({ message: "An error occurred while fetching tickets" });
