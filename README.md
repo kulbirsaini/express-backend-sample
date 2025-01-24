@@ -29,6 +29,7 @@ I created this app as a backend for the [React Native App](https://github.com/ku
   - Fetch (`GET /tickets`)
     - Supports various query parameters
   - Creation (`POST /tickets`)
+    - Requires `title`, `descirption`
 - Hello!
   - Hello! (`GET /hello`)
 
