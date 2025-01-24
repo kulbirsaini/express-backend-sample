@@ -10,6 +10,7 @@ import { database } from "../lib/database.js";
 import morgan from "morgan";
 import { rateLimit } from "express-rate-limit";
 import { UserRouter } from "../routes/user.js";
+import { TicketRouter } from "../routes/ticket.js";
 
 const rateLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
@@ -67,6 +68,7 @@ app.use("/user", verifyAuth, UserRouter);
 
 // Protected routers below this. Must contain `verifyAuth` middleware
 app.use("/posts", verifyAuth, PostRouter);
+app.use("/tickets", verifyAuth, TicketRouter);
 
 app.use((error, req, res, next) => {
   console.error("Global error handler", error);
