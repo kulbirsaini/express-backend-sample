@@ -6,12 +6,13 @@ I created this app as a backend for the [React Native App](https://github.com/ku
 
 - Authentication
   - Registration (`POST /auth/register`)
+    - Requires `email`, `password`, `name`
   - Confirmation via token (`GET /auth/confirm/:token`)
   - Confirmation via OTP (`POST /auth/confirm/otp`)
     - Required Email and OTP for confirmation
   - Request Confirmation (`POST /auth/confirm`)
   - Login (`POST /auth/login`)
-    - Returns JWT on successful authentication
+    - Returns JWT on successful authentication valid for 7 days
   - Logout (`DELETE /auth/logout`)
 - Authenticated User
   - Profile (`GET /user/me`)
@@ -24,6 +25,10 @@ I created this app as a backend for the [React Native App](https://github.com/ku
     - Supports file uploads to Imagekit.io
   - Like (`PUT /posts/:id/like`)
   - Unlike (`PUT /posts/:id/unlike`)
+- Ticket
+  - Fetch (`GET /tickets`)
+    - Supports various query parameters
+  - Creation (`POST /tickets`)
 - Hello!
   - Hello! (`GET /hello`)
 

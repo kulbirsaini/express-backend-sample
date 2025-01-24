@@ -10,7 +10,7 @@ export const deliverEmail = async (req, res, next) => {
   const { email, subject, body } = req.body;
 
   try {
-    await sendEmail({ to: email, subject, html: body, text: body, from: process.env.FROM_EMAIL_ADDRESS });
+    await sendEmail({ to: email, subject, html: body.replace(/(?:\r\n|\r|\n)/g, "<br>"), text: body, from: process.env.FROM_EMAIL_ADDRESS });
 
     return res.status(200).json({ message: "Email sent successfully" });
   } catch (error) {
